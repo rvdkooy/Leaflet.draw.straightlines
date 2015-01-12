@@ -1,8 +1,9 @@
 (function(){
+    
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove;
     var originalMouseUp = L.Draw.Polyline.prototype._onMouseUp;
 
-    var mousemarker, map, horizontalLine, verticalLine;
+    var currentPoint, horizontalLine, verticalLine, lastPoint;
 
     window.onkeydown = function(e){
         if(e.shiftKey && !horizontalLine) {
@@ -22,34 +23,30 @@
     L.Draw.Polyline.prototype._onMouseMove = function(e){
         orignalMouseMove.call(this, e);
 
-        if(!map){
-           map =  e.target;
-        }
-        
         if(!horizontalLine && !verticalLine) return;
         
-        map.eachLayer(function(layer){
-            
-            if(layer._icon && layer._icon.className.indexOf('leaflet-editing-icon') !== -1){
-                mousemarker = layer;
+        e.target.eachLayer(function(layer){
+            // the last marker on the map is the currentpoint
+            if(layer instanceof L.Marker){
+                currentPoint = layer;
             }
         });
 
-        if(mousemarker){
+        if(currentPoint){
             
-            var newLayerPoint = map.latLngToLayerPoint(mousemarker._latlng);
+            var newLayerPoint = map.latLngToLayerPoint(currentPoint._latlng);
             
             if(horizontalLine){
-                mousemarker._latlng.lat = this.lastPoint.lat;
+                currentPoint._latlng.lat = lastPoint.lat;
                 e.layerPoint.y = newLayerPoint.y;
             }
 
             if(verticalLine){
-                mousemarker._latlng.lng = this.lastPoint.lng;
+                currentPoint._latlng.lng = lastPoint.lng;
                 e.layerPoint.x = newLayerPoint.x;
             }
             
-            mousemarker.update();
+            currentPoint.update();
             this._updateGuide(e.layerPoint);
         }
     };
@@ -59,25 +56,25 @@
 
         var line;
         
-        map.eachLayer(function(layer){
-            
-            if(layer._path){
+        e.target.eachLayer(function(layer){
+            // the last Polyline on the map the one we just drew
+            if(layer instanceof L.Polyline){
                 line = layer;
             }
         });
         
-        this.lastPoint = e.latlng;
+        lastPoint = e.latlng;
 
         if(!horizontalLine && !verticalLine) return;
 
-        if(this.lastPoint && line._latlngs.length){
+        if(lastPoint && line._latlngs.length){
             if(horizontalLine){
-                line._latlngs[line._latlngs.length - 1].lat = mousemarker._latlng.lat;
-                line._latlngs[line._latlngs.length - 2].lat = mousemarker._latlng.lat;
+                line._latlngs[line._latlngs.length - 1].lat = currentPoint._latlng.lat;
+                line._latlngs[line._latlngs.length - 2].lat = currentPoint._latlng.lat;
             }
             else if(verticalLine){
-                line._latlngs[line._latlngs.length - 1].lng = mousemarker._latlng.lng;
-                line._latlngs[line._latlngs.length - 2].lng = mousemarker._latlng.lng;
+                line._latlngs[line._latlngs.length - 1].lng = currentPoint._latlng.lng;
+                line._latlngs[line._latlngs.length - 2].lng = currentPoint._latlng.lng;
             }
 
             line.redraw();
