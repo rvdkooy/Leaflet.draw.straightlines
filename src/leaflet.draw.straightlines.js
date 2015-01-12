@@ -43,15 +43,7 @@
         originalMouseUp.call(this, e);
 
         lastPoint = e.latlng;
-        
-        map.eachLayer(function(layer){
-            // the last Polyline on the map the one we just drew
-            if(layer instanceof L.Polyline){
-                currentLine = layer;
-            }
-        });
-
-        
+        currentLine = getLayerOfType(L.Polyline);
 
         if(horizontalLine || verticalLine){
              var latLngs = currentLine.getLatLngs();
@@ -70,12 +62,16 @@
                 
             }
         }
+        currentMarker = getLayerOfType(L.Marker);
+    };
 
+    function getLayerOfType(type){
+        var result;
         map.eachLayer(function(layer){
-            // the last marker on the map is the one we just added
-            if(layer instanceof L.Marker){
-                currentMarker = layer;
+            if(layer instanceof type){
+                result = layer;
             }
         });
-    };
+        return result;
+    }
 })();
