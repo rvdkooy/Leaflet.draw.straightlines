@@ -1,17 +1,13 @@
-(function(){
+(function(undefined){
     
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove;
     var originalMouseUp = L.Draw.Polyline.prototype._onMouseUp;
 
-    var currentMarker, horizontalLine, verticalLine, lastPoint;
+    var currentMarker, currentLine, horizontalLine, verticalLine, lastPoint, map;
 
     window.onkeydown = function(e){
-        if(e.shiftKey && !horizontalLine) {
-            horizontalLine = true;
-        }
-        if(e.ctrlKey){
-            verticalLine = true;
-        }
+        horizontalLine = e.shiftKey;
+        verticalLine = e.ctrlKey;
     };
 
     window.onkeyup = function(e){
@@ -19,21 +15,13 @@
         verticalLine = false;
     };
 
-
     L.Draw.Polyline.prototype._onMouseMove = function(e){
         orignalMouseMove.call(this, e);
-
-        if(!horizontalLine && !verticalLine) return;
         
-        e.target.eachLayer(function(layer){
-            // the last marker on the map is the currentMarker
-            if(layer instanceof L.Marker){
-                currentMarker = layer;
-            }
-        });
+        map = e.target;
 
-        if(currentMarker){
-            
+        if((horizontalLine || verticalLine) && currentMarker)
+        {
             var currentPoint = map.latLngToLayerPoint(currentMarker.getLatLng());
             
             if(horizontalLine){
@@ -54,33 +42,40 @@
     L.Draw.Polyline.prototype._onMouseUp = function(e){
         originalMouseUp.call(this, e);
 
-        var line;
+        lastPoint = e.latlng;
         
-        e.target.eachLayer(function(layer){
+        map.eachLayer(function(layer){
             // the last Polyline on the map the one we just drew
             if(layer instanceof L.Polyline){
-                line = layer;
+                currentLine = layer;
             }
         });
+
         
-        lastPoint = e.latlng;
 
-        if(!horizontalLine && !verticalLine) return;
+        if(horizontalLine || verticalLine){
+             var latLngs = currentLine.getLatLngs();
 
-        var latLngs = line.getLatLngs();
-        
-        if(lastPoint && latLngs.length){
-            
-            if(horizontalLine){
-                latLngs[latLngs.length - 1].lat = currentMarker.getLatLng().lat;
-                latLngs[latLngs.length - 2].lat = currentMarker.getLatLng().lat;
+            if(lastPoint && latLngs.length){
+                
+                if(horizontalLine){
+                    latLngs[latLngs.length - 1].lat = currentMarker.getLatLng().lat;
+                    latLngs[latLngs.length - 2].lat = currentMarker.getLatLng().lat;
+                }
+                else if(verticalLine){
+                    latLngs[latLngs.length - 1].lng = currentMarker.getLatLng().lng;
+                    latLngs[latLngs.length - 2].lng = currentMarker.getLatLng().lng;
+                }
+                currentLine.redraw();
+                
             }
-            else if(verticalLine){
-                latLngs[latLngs.length - 1].lng = currentMarker.getLatLng().lng;
-                latLngs[latLngs.length - 2].lng = currentMarker.getLatLng().lng;
-            }
-
-            line.redraw();
         }
+
+        map.eachLayer(function(layer){
+            // the last marker on the map is the one we just added
+            if(layer instanceof L.Marker){
+                currentMarker = layer;
+            }
+        });
     };
 })();
