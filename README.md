@@ -1,7 +1,7 @@
 # Leaflet.draw.straightlines
 Leaflet.draw plugin that allows you to draw straight lines
 
-When using this plugin you can draw straight lines with Leaflet.draw by just pressing the ctrl or shift key when
+When using this plugin you can draw straight lines with Leaflet.draw by just pressing the ctrl or shift key.
 
 To compile the sources:
 
