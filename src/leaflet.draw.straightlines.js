@@ -3,7 +3,7 @@
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove;
     var originalMouseUp = L.Draw.Polyline.prototype._onMouseUp;
 
-    var currentPoint, horizontalLine, verticalLine, lastPoint;
+    var currentMarker, horizontalLine, verticalLine, lastPoint;
 
     window.onkeydown = function(e){
         if(e.shiftKey && !horizontalLine) {
@@ -26,27 +26,27 @@
         if(!horizontalLine && !verticalLine) return;
         
         e.target.eachLayer(function(layer){
-            // the last marker on the map is the currentpoint
+            // the last marker on the map is the currentMarker
             if(layer instanceof L.Marker){
-                currentPoint = layer;
+                currentMarker = layer;
             }
         });
 
-        if(currentPoint){
+        if(currentMarker){
             
-            var newLayerPoint = map.latLngToLayerPoint(currentPoint._latlng);
+            var currentPoint = map.latLngToLayerPoint(currentMarker.getLatLng());
             
             if(horizontalLine){
-                currentPoint._latlng.lat = lastPoint.lat;
-                e.layerPoint.y = newLayerPoint.y;
+                currentMarker.setLatLng(L.latLng(lastPoint.lat, currentMarker.getLatLng().lng));
+                e.layerPoint.y = currentPoint.y;
             }
 
             if(verticalLine){
-                currentPoint._latlng.lng = lastPoint.lng;
-                e.layerPoint.x = newLayerPoint.x;
+                currentMarker.setLatLng(L.latLng(currentMarker.getLatLng().lat, lastPoint.lng));
+                e.layerPoint.x = currentPoint.x;
             }
             
-            currentPoint.update();
+            currentMarker.update();
             this._updateGuide(e.layerPoint);
         }
     };
@@ -67,14 +67,17 @@
 
         if(!horizontalLine && !verticalLine) return;
 
-        if(lastPoint && line._latlngs.length){
+        var latLngs = line.getLatLngs();
+        
+        if(lastPoint && latLngs.length){
+            
             if(horizontalLine){
-                line._latlngs[line._latlngs.length - 1].lat = currentPoint._latlng.lat;
-                line._latlngs[line._latlngs.length - 2].lat = currentPoint._latlng.lat;
+                latLngs[latLngs.length - 1].lat = currentMarker.getLatLng().lat;
+                latLngs[latLngs.length - 2].lat = currentMarker.getLatLng().lat;
             }
             else if(verticalLine){
-                line._latlngs[line._latlngs.length - 1].lng = currentPoint._latlng.lng;
-                line._latlngs[line._latlngs.length - 2].lng = currentPoint._latlng.lng;
+                latLngs[latLngs.length - 1].lng = currentMarker.getLatLng().lng;
+                latLngs[latLngs.length - 2].lng = currentMarker.getLatLng().lng;
             }
 
             line.redraw();
