@@ -1,6 +1,6 @@
 {
-  "name": "Leaflet.draw.straightlines",
-  "version": "0.0.1",
+  "name": "leaflet.draw.straightlines",
+  "version": "1.0.0",
   "description": "Leaflet.draw plugin that allows you to draw straight lines",
   "main": "dist/leaflet.draw.straightlines.min.js",
   "scripts": {
