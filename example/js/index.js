@@ -19,6 +19,7 @@ var drawControl = new L.Control.Draw({
 });
 
 map.addControl(drawControl);
+map.initStraightLines();
 
 map.on('draw:created', function (e) {
     map.addLayer(e.layer);
