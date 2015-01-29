@@ -1,6 +1,7 @@
 (function(undefined){
     
-    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, currentMarker, straightline, lastPoint, map;
+    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, currentMarker, straightline, 
+        lastPoint, map, dragging;
     
     window.onkeydown = function(e){
         straightline = e.ctrlKey;
@@ -13,6 +14,8 @@
     L.Draw.Polyline.prototype._onMouseMove = function(e){
         orignalMouseMove.call(this, e);
 
+        if(dragging) return;
+        
         if((straightline) && currentMarker)
         {
             var currentPoint = map.latLngToLayerPoint(currentMarker.getLatLng());
@@ -33,8 +36,15 @@
 
     L.Map.prototype.initStraightLines = function(){
         map = this;
-        
+        map.on('dragstart', function(){
+            dragging = true;
+        });
+        map.on('dragend', function(){
+            dragging = false;
+        });
         map.on('mouseup', function(e){
+            
+            if(dragging) return;
             
             setTimeout(function(){
                 
