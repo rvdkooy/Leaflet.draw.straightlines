@@ -59,6 +59,7 @@
                                 latLngs[latLngs.length - 2].lng = lastPoint.lng;   
                             }
                             currentLine.redraw();
+                            currentMarker.update();
                         }
                     }
                     
