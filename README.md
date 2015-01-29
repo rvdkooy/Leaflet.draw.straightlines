@@ -8,3 +8,9 @@ To compile the sources:
 ```
 npm run compile
 ```
+
+To use the plugin:
+``` javascript
+var map = L.map('map').setView([51.505, -0.09], 13);
+map.initStraightLines();
+```
