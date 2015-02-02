@@ -9,12 +9,21 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var drawnItems = new L.FeatureGroup();
+
 map.addLayer(drawnItems);
 
 var drawControl = new L.Control.Draw({
+	draw: {
+        polygon: {
+            allowIntersection: false
+        },
+        polyline: false,
+        rectangle: false,
+        circle: false,
+        marker: false
+    },
     edit: {
         featureGroup: drawnItems,
-        edit: true
     }
 });
 
@@ -22,5 +31,6 @@ map.addControl(drawControl);
 map.initStraightLines();
 
 map.on('draw:created', function (e) {
-    map.addLayer(e.layer);
+    //e.layer.editing.enable();
+    drawnItems.addLayer(e.layer);
 });
