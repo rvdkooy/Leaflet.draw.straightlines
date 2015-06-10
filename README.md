@@ -14,3 +14,13 @@ To use the plugin:
 var map = L.map('map').setView([51.505, -0.09], 13);
 map.initStraightLines();
 ```
+
+Alternatively specify a function to start the straightlines functionality. For example with the shift key:
+``` javascript
+var map = L.map('map').setView([51.505, -0.09], 13);
+map.initStraightLines({
+    startFn: function (e) {
+        return e.shiftKey;
+    }
+});
+```
