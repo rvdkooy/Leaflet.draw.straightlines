@@ -1,8 +1,7 @@
 (function(undefined){
     'use strict';
-    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, currentMarker, straightline, 
-        lastPoint, map, dragging;
-    
+    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging;
+
     window.onkeydown = function(e){
         straightline = e.ctrlKey;
     };
@@ -34,7 +33,7 @@
     };
 
     L.Map.prototype.initStraightLines = function(){
-        map = this;
+        var map = this;
         map.on('dragstart', function(){
             dragging = true;
         });
@@ -42,41 +41,35 @@
             dragging = false;
         });
         map.on('mouseup', function(e){
-            
-            setTimeout(function(){
-                if(dragging) return;
 
-                var currentLine = getLayerOfType(L.Polyline);
-            
-                currentMarker = getLayerOfType(L.Marker);
-                
+            setTimeout(function(){
+                if(!straightline || dragging) return;
+
+                var currentMarker = getLayerOfType(L.Marker);
                 if(currentMarker){
-                    
-                    if(straightline && currentLine){
-                         
+                    var currentLine = getLayerOfType(L.Polyline);
+                    if(currentLine){
+
                         var latLngs = currentLine.getLatLngs();
-                        
-                        if(lastPoint && latLngs.length){
-                            
+                        if(latLngs.length > 1){
+                            var lastPoint = latLngs[latLngs.length - 2];
+
                             if(isHorizontal(e.latlng, lastPoint)){
                                 latLngs[latLngs.length - 1].lat = lastPoint.lat;
-                                latLngs[latLngs.length - 2].lat = lastPoint.lat;
                             }
                             else {
                                 latLngs[latLngs.length - 1].lng = lastPoint.lng;
-                                latLngs[latLngs.length - 2].lng = lastPoint.lng;   
                             }
                             currentLine.redraw();
                             currentMarker.update();
                         }
                     }
-                    
-                    lastPoint = currentMarker.getLatLng();
-                }    
-            });            
+
+                }
+            });
         });
     };
-    
+
     function getLayerOfType(type){
         var result;
         map.eachLayer(function(layer){
@@ -92,5 +85,5 @@
         var lngDiff = Math.abs(mousePosition.lng - lastPoint.lng);
 
         return latDiff < lngDiff;
-    }    
+    }
 })();
