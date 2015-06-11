@@ -1,6 +1,6 @@
 (function(undefined){
     'use strict';
-    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging;
+    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map;
 
     window.onkeydown = function(e){
         straightline = e.ctrlKey;
@@ -33,7 +33,7 @@
     };
 
     L.Map.prototype.initStraightLines = function(){
-        var map = this;
+        map = this;
         map.on('dragstart', function(){
             dragging = true;
         });
