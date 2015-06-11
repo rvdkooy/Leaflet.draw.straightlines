@@ -1,4 +1,4 @@
-(function(undefined){
+(function(L){
     'use strict';
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map;
 
@@ -6,7 +6,7 @@
         straightline = e.ctrlKey;
     };
 
-    window.onkeyup = function(e){
+    window.onkeyup = function(){
         straightline = false;
     };
 
@@ -21,7 +21,7 @@
             var currentPosition = currentMarker.getLatLng();
             var currentPoint = map.latLngToLayerPoint(currentPosition);
 
-            if(isHorizontal(e.latlng, currentPosition)){
+            if(isHorizontal(e.layerPoint, currentPoint)){
                 e.layerPoint.y = currentPoint.y;
             }
             else{
@@ -40,8 +40,7 @@
         map.on('dragend', function(){
             dragging = false;
         });
-        map.on('mouseup', function(e){
-
+        map.on('mouseup', function(){
             setTimeout(function(){
                 if(!straightline || dragging) return;
 
@@ -65,7 +64,7 @@
     };
 
     function getLayerOfType(type){
-        var result;
+        var result = null;
         map.eachLayer(function(layer){
             if(layer instanceof type){
                 result = layer;
@@ -74,13 +73,23 @@
         return result;
     }
 
-    function isHorizontal(pastPosition, previousPosition){
-        var lastPoint = map.latLngToLayerPoint(pastPosition);
-        var previousPoint = map.latLngToLayerPoint(previousPosition);
+    function isHorizontal(current, previous){
+        var currentPoint, previousPoint;
 
-        var diffX = Math.abs(lastPoint.x - previousPoint.x);
-        var diffY = Math.abs(lastPoint.y - previousPoint.y);
+        if (current.x) {
+            currentPoint= current;
+        } else{
+            currentPoint = map.latLngToLayerPoint(current);
+        }
+        if (previous.x){
+            previousPoint = previous;
+        } else{
+            previousPoint = map.latLngToLayerPoint(previous);
+        }
+
+        var diffX= Math.abs(currentPoint.x - previousPoint.x);
+        var diffY = Math.abs(currentPoint.y - previousPoint.y);
 
         return diffY < diffX;
     }
-})();
+})(window.L);
