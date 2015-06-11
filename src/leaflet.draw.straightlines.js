@@ -1,30 +1,29 @@
-(function(L){
+(function (L) {
     'use strict';
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map;
 
-    window.onkeydown = function(e){
+    window.onkeydown = function (e) {
         straightline = e.ctrlKey;
     };
 
-    window.onkeyup = function(){
+    window.onkeyup = function () {
         straightline = false;
     };
 
-    L.Draw.Polyline.prototype._onMouseMove = function(e){
+    L.Draw.Polyline.prototype._onMouseMove = function (e) {
         orignalMouseMove.call(this, e);
 
-        if(!straightline || dragging) return;
+        if (!straightline || dragging) return;
 
         var currentMarker = getLayerOfType(L.Marker);
-        if(currentMarker)
-        {
+        if (currentMarker) {
             var currentPosition = currentMarker.getLatLng();
             var currentPoint = map.latLngToLayerPoint(currentPosition);
 
-            if(isHorizontal(e.layerPoint, currentPoint)){
+            if (isHorizontal(e.layerPoint, currentPoint)) {
                 e.layerPoint.y = currentPoint.y;
             }
-            else{
+            else {
                 e.layerPoint.x = currentPoint.x;
             }
 
@@ -32,25 +31,25 @@
         }
     };
 
-    L.Map.prototype.initStraightLines = function(){
+    L.Map.prototype.initStraightLines = function () {
         map = this;
-        map.on('dragstart', function(){
+        map.on('dragstart', function () {
             dragging = true;
         });
-        map.on('dragend', function(){
+        map.on('dragend', function () {
             dragging = false;
         });
-        map.on('mouseup', function(){
-            setTimeout(function(){
-                if(!straightline || dragging) return;
+        map.on('mouseup', function () {
+            setTimeout(function () {
+                if (!straightline || dragging) return;
 
                 var currentLine = getLayerOfType(L.Polyline);
-                if(currentLine){
+                if (currentLine) {
                     var latLngs = currentLine.getLatLngs();
                     var lastPosition = latLngs[latLngs.length - 1];
                     var previousPosition = latLngs[latLngs.length - 2];
 
-                    if(isHorizontal(lastPosition, previousPosition)){
+                    if (isHorizontal(lastPosition, previousPosition)) {
                         lastPosition.lat = previousPosition.lat;
                     }
                     else {
@@ -63,31 +62,31 @@
         });
     };
 
-    function getLayerOfType(type){
+    function getLayerOfType(type) {
         var result = null;
-        map.eachLayer(function(layer){
-            if(layer instanceof type){
+        map.eachLayer(function (layer) {
+            if (layer instanceof type) {
                 result = layer;
             }
         });
         return result;
     }
 
-    function isHorizontal(current, previous){
+    function isHorizontal(current, previous) {
         var currentPoint, previousPoint;
 
         if (current.x) {
-            currentPoint= current;
-        } else{
+            currentPoint = current;
+        } else {
             currentPoint = map.latLngToLayerPoint(current);
         }
-        if (previous.x){
+        if (previous.x) {
             previousPoint = previous;
-        } else{
+        } else {
             previousPoint = map.latLngToLayerPoint(previous);
         }
 
-        var diffX= Math.abs(currentPoint.x - previousPoint.x);
+        var diffX = Math.abs(currentPoint.x - previousPoint.x);
         var diffY = Math.abs(currentPoint.y - previousPoint.y);
 
         return diffY < diffX;
