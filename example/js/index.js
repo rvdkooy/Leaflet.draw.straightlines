@@ -21,7 +21,11 @@
     });
 
     map.addControl(drawControl);
-    map.initStraightLines();
+    map.initStraightLines({
+        start: function(e){
+            return e.shiftKey;
+        }
+    });
 
     map.on('draw:created', function (e) {
         map.addLayer(e.layer);

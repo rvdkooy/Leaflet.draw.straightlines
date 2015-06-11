@@ -1,9 +1,9 @@
 (function (L) {
     'use strict';
-    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map;
+    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map, start;
 
     window.onkeydown = function (e) {
-        straightline = e.ctrlKey;
+        straightline = start(e);;
     };
 
     window.onkeyup = function () {
@@ -31,7 +31,12 @@
         }
     };
 
-    L.Map.prototype.initStraightLines = function () {
+    L.Map.prototype.initStraightLines = function (options) {
+        options = options || {};
+        start = options.start || function (e) {
+            return e.ctrlKey;
+        };
+
         map = this;
         map.on('dragstart', function () {
             dragging = true;
