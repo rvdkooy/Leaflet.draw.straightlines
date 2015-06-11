@@ -1,5 +1,5 @@
 (function(undefined){
-    
+    'use strict';
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, currentMarker, straightline, 
         lastPoint, map, dragging;
     
@@ -44,10 +44,9 @@
         });
         map.on('mouseup', function(e){
             
-            if(dragging) return;
-            
             setTimeout(function(){
-                
+                if(dragging) return;
+
                 var currentLine = getLayerOfType(L.Polyline);
             
                 currentMarker = getLayerOfType(L.Marker);
