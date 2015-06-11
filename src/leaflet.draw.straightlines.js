@@ -1,98 +1,94 @@
-(function(undefined){
-    
-    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, currentMarker, straightline, 
-        lastPoint, map, dragging;
-    
-    window.onkeydown = function(e){
+(function (L) {
+    'use strict';
+    var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map;
+
+    window.onkeydown = function (e) {
         straightline = e.ctrlKey;
     };
 
-    window.onkeyup = function(e){
+    window.onkeyup = function () {
         straightline = false;
     };
 
-    L.Draw.Polyline.prototype._onMouseMove = function(e){
+    L.Draw.Polyline.prototype._onMouseMove = function (e) {
         orignalMouseMove.call(this, e);
 
-        if(dragging) return;
-        
-        if((straightline) && currentMarker)
-        {
-            var currentPoint = map.latLngToLayerPoint(currentMarker.getLatLng());
-            
-            if(isHorizontal(e.latlng)){
-                currentMarker.setLatLng(L.latLng(lastPoint.lat, currentMarker.getLatLng().lng));
+        if (!straightline || dragging) return;
+
+        var currentMarker = getLayerOfType(L.Marker);
+        if (currentMarker) {
+            var currentPosition = currentMarker.getLatLng();
+            var currentPoint = map.latLngToLayerPoint(currentPosition);
+
+            if (isHorizontal(e.layerPoint, currentPoint)) {
                 e.layerPoint.y = currentPoint.y;
             }
-            else{
-                currentMarker.setLatLng(L.latLng(currentMarker.getLatLng().lat, lastPoint.lng));
+            else {
                 e.layerPoint.x = currentPoint.x;
             }
 
             this._updateGuide(e.layerPoint);
-            currentMarker.update();
         }
     };
 
-    L.Map.prototype.initStraightLines = function(){
+    L.Map.prototype.initStraightLines = function () {
         map = this;
-        map.on('dragstart', function(){
+        map.on('dragstart', function () {
             dragging = true;
         });
-        map.on('dragend', function(){
+        map.on('dragend', function () {
             dragging = false;
         });
-        map.on('mouseup', function(e){
-            
-            if(dragging) return;
-            
-            setTimeout(function(){
-                
+        map.on('mouseup', function () {
+            setTimeout(function () {
+                if (!straightline || dragging) return;
+
                 var currentLine = getLayerOfType(L.Polyline);
-            
-                currentMarker = getLayerOfType(L.Marker);
-                
-                if(currentMarker){
-                    
-                    if(straightline && currentLine){
-                         
-                        var latLngs = currentLine.getLatLngs();
-                        
-                        if(lastPoint && latLngs.length){
-                            
-                            if(isHorizontal(e.latlng)){
-                                latLngs[latLngs.length - 1].lat = lastPoint.lat;
-                                latLngs[latLngs.length - 2].lat = lastPoint.lat;
-                            }
-                            else {
-                                latLngs[latLngs.length - 1].lng = lastPoint.lng;
-                                latLngs[latLngs.length - 2].lng = lastPoint.lng;   
-                            }
-                            currentLine.redraw();
-                            currentMarker.update();
-                        }
+                if (currentLine) {
+                    var latLngs = currentLine.getLatLngs();
+                    var lastPosition = latLngs[latLngs.length - 1];
+                    var previousPosition = latLngs[latLngs.length - 2];
+
+                    if (isHorizontal(lastPosition, previousPosition)) {
+                        lastPosition.lat = previousPosition.lat;
                     }
-                    
-                    lastPoint = currentMarker.getLatLng();
-                }    
-            });            
+                    else {
+                        lastPosition.lng = previousPosition.lng;
+                    }
+                    currentLine.redraw();
+                    getLayerOfType(L.Marker).update();
+                }
+            });
         });
     };
-    
-    function getLayerOfType(type){
-        var result;
-        map.eachLayer(function(layer){
-            if(layer instanceof type){
+
+    function getLayerOfType(type) {
+        var result = null;
+        map.eachLayer(function (layer) {
+            if (layer instanceof type) {
                 result = layer;
             }
         });
         return result;
     }
 
-    function isHorizontal(mousePosition){
-        var latDiff = Math.abs(mousePosition.lat - lastPoint.lat);
-        var lngDiff = Math.abs(mousePosition.lng - lastPoint.lng);
+    function isHorizontal(current, previous) {
+        var currentPoint, previousPoint;
 
-        return latDiff < lngDiff;
-    }    
-})();
+        if (current.x) {
+            currentPoint = current;
+        } else {
+            currentPoint = map.latLngToLayerPoint(current);
+        }
+        if (previous.x) {
+            previousPoint = previous;
+        } else {
+            previousPoint = map.latLngToLayerPoint(previous);
+        }
+
+        var diffX = Math.abs(currentPoint.x - previousPoint.x);
+        var diffY = Math.abs(currentPoint.y - previousPoint.y);
+
+        return diffY < diffX;
+    }
+})(window.L);
