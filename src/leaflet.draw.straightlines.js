@@ -14,23 +14,22 @@
     L.Draw.Polyline.prototype._onMouseMove = function(e){
         orignalMouseMove.call(this, e);
 
-        if(dragging) return;
-        
-        if((straightline) && currentMarker)
+        if(!straightline || dragging) return;
+
+        var currentMarker = getLayerOfType(L.Marker);
+        if(currentMarker)
         {
-            var currentPoint = map.latLngToLayerPoint(currentMarker.getLatLng());
-            
-            if(isHorizontal(e.latlng)){
-                currentMarker.setLatLng(L.latLng(lastPoint.lat, currentMarker.getLatLng().lng));
+            var currentPosition = currentMarker.getLatLng();
+            var currentPoint = map.latLngToLayerPoint(currentPosition);
+
+            if(isHorizontal(e.latlng, currentPosition)){
                 e.layerPoint.y = currentPoint.y;
             }
             else{
-                currentMarker.setLatLng(L.latLng(currentMarker.getLatLng().lat, lastPoint.lng));
                 e.layerPoint.x = currentPoint.x;
             }
 
             this._updateGuide(e.layerPoint);
-            currentMarker.update();
         }
     };
 
@@ -59,7 +58,7 @@
                         
                         if(lastPoint && latLngs.length){
                             
-                            if(isHorizontal(e.latlng)){
+                            if(isHorizontal(e.latlng, lastPoint)){
                                 latLngs[latLngs.length - 1].lat = lastPoint.lat;
                                 latLngs[latLngs.length - 2].lat = lastPoint.lat;
                             }
@@ -88,7 +87,7 @@
         return result;
     }
 
-    function isHorizontal(mousePosition){
+    function isHorizontal(mousePosition, lastPoint){
         var latDiff = Math.abs(mousePosition.lat - lastPoint.lat);
         var lngDiff = Math.abs(mousePosition.lng - lastPoint.lng);
 
