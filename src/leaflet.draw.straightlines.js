@@ -74,10 +74,13 @@
         return result;
     }
 
-    function isHorizontal(mousePosition, lastPoint){
-        var latDiff = Math.abs(mousePosition.lat - lastPoint.lat);
-        var lngDiff = Math.abs(mousePosition.lng - lastPoint.lng);
+    function isHorizontal(pastPosition, previousPosition){
+        var lastPoint = map.latLngToLayerPoint(pastPosition);
+        var previousPoint = map.latLngToLayerPoint(previousPosition);
 
-        return latDiff < lngDiff;
+        var diffX = Math.abs(lastPoint.x - previousPoint.x);
+        var diffY = Math.abs(lastPoint.y - previousPoint.y);
+
+        return diffY < diffX;
     }
 })();
