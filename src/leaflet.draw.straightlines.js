@@ -45,26 +45,20 @@
             setTimeout(function(){
                 if(!straightline || dragging) return;
 
-                var currentMarker = getLayerOfType(L.Marker);
-                if(currentMarker){
-                    var currentLine = getLayerOfType(L.Polyline);
-                    if(currentLine){
+                var currentLine = getLayerOfType(L.Polyline);
+                if(currentLine){
+                    var latLngs = currentLine.getLatLngs();
+                    var lastPosition = latLngs[latLngs.length - 1];
+                    var previousPosition = latLngs[latLngs.length - 2];
 
-                        var latLngs = currentLine.getLatLngs();
-                        if(latLngs.length > 1){
-                            var lastPoint = latLngs[latLngs.length - 2];
-
-                            if(isHorizontal(e.latlng, lastPoint)){
-                                latLngs[latLngs.length - 1].lat = lastPoint.lat;
-                            }
-                            else {
-                                latLngs[latLngs.length - 1].lng = lastPoint.lng;
-                            }
-                            currentLine.redraw();
-                            currentMarker.update();
-                        }
+                    if(isHorizontal(lastPosition, previousPosition)){
+                        lastPosition.lat = previousPosition.lat;
                     }
-
+                    else {
+                        lastPosition.lng = previousPosition.lng;
+                    }
+                    currentLine.redraw();
+                    getLayerOfType(L.Marker).update();
                 }
             });
         });
