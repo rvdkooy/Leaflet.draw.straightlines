@@ -3,7 +3,9 @@
     var orignalMouseMove = L.Draw.Polyline.prototype._onMouseMove, straightline, dragging, map, start;
 
     window.onkeydown = function (e) {
-        straightline = start(e);;
+        if (typeof start === "function") {
+            straightline = start(e);
+        }
     };
 
     window.onkeyup = function () {
