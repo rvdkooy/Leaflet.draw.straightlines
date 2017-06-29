@@ -63,7 +63,10 @@
                         lastPosition.lng = previousPosition.lng;
                     }
                     currentLine.redraw();
-                    getLayerOfType(L.Marker).update();
+                    var layer = getLayerOfType(L.Marker);
+                    if (layer) {
+                        layer.update();
+                    }
                 }
             });
         });
