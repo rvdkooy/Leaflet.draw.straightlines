@@ -52,7 +52,7 @@
 
                 var currentLine = getLayerOfType(L.Polyline);
                 if (currentLine) {
-                    var latLngs = currentLine.getLatLngs();
+                    var latLngs = currentLine.getLatLngs()[0];
                     var lastPosition = latLngs[latLngs.length - 1];
                     var previousPosition = latLngs[latLngs.length - 2];
 
