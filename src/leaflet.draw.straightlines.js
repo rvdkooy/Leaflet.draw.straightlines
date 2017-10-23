@@ -53,10 +53,10 @@
                 var currentLine = getLayerOfType(L.Polyline);
                 if (currentLine) {
                     var latLngs = currentLine.getLatLngs();
-					
-					if (latLngs != undefined && latLngs.length === 1 && latLngs[0].constructor === Array) //then it's a nested array	
-						latLngs = latLngs[0];
-					
+
+                    if (latLngs != undefined && latLngs.length === 1 && latLngs[0].constructor === Array) //then it's a nested array    
+                        latLngs = latLngs[0];
+
                     var lastPosition = latLngs[latLngs.length - 1];
                     var previousPosition = latLngs[latLngs.length - 2];
 
