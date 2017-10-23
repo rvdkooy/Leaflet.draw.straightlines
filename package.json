@@ -1,6 +1,6 @@
 {
   "name": "leaflet-draw-straightlines",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "description": "Leaflet.draw plugin that allows you to draw straight lines",
   "main": "dist/leaflet.draw.straightlines.min.js",
   "scripts": {
@@ -22,5 +22,9 @@
     "gulp-uglify": "^1.0.2",
     "leaflet": "^1.2.0",
     "leaflet-draw": "^0.4.12"
+  },
+  "peerDependencies": {
+    "leaflet": "^1.2.0",
+    "leaflet-draw": "^0.4.0"
   }
 }
