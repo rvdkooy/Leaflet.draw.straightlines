@@ -54,7 +54,7 @@
                 if (currentLine) {
                     var latLngs = currentLine.getLatLngs();
 
-                    if (latLngs != undefined && latLngs.length === 1 && latLngs[0].constructor === Array) //then it's a nested array    
+                    if (latLngs != undefined && latLngs.length === 1 && $.isArray(latLngs[0]))
                         latLngs = latLngs[0];
 
                     var lastPosition = latLngs[latLngs.length - 1];
